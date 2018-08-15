@@ -1,0 +1,21 @@
+\documentclass{article}
+
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lipsum} % add nonsense text
+
+\begin{document}
+
+
+\lipsum[1]
+
+  %----------------------------------------------------------------------------------------
+  %   EDUCATION
+  %----------------------------------------------------------------------------------------
+
+<<>>=
+ggplot(mtcars[i,], aes(x = cyl, y = disp) ) + geom_point()
+@
+
+\end{document}
