@@ -1,21 +1,131 @@
-\documentclass{article}
+\documentclass[25pt,a1paper,landscape, margin=8mm, innermargin=5mm,
+blockverticalspace=6mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 
+%----------------------------------------------------------------------------------------
+% TIKZPOSTER AND FONT OPTIONS + FIGURE ENVIRONMENT
+%----------------------------------------------------------------------------------------
 
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{lipsum} % add nonsense text
+\usetheme{Desert}
+\usecolorstyle{Spain}
+\usetitlestyle{Filled}
+
+\usepackage{fontspec}
+\setmainfont{FreeSerif}
+\setsansfont{FreeSans}
+
+\newenvironment{Figure}
+    {\par\medskip\noindent\minipage{\linewidth}}
+    {\endminipage\par\medskip}
+
+%----------------------------------------------------------------------------------------
+% SET KNIT OPTIONS
+%----------------------------------------------------------------------------------------
+
+<<knitr_options, echo=FALSE>>=
+opts_chunk$set(echo = FALSE)
+# install R packages if necessary:
+# if(!require("ggplot")) install.packages("ggplot")
+@
+
+%----------------------------------------------------------------------------------------
+% HEADER INFORMATION AND FORMATTING
+%----------------------------------------------------------------------------------------
+
+\title{\Sexpr{regioncard_title} : \hspace{8pt} Ocean Health Index Project Region Summary Card}
+\author{National Center for Ecological Analysis and Synthesis}
+\institute{Report Generated on \Sexpr{makedate}}
+\titlegraphic{\includegraphics[width=\linewidth]{example-image}}
+
+\makeatletter
+\renewcommand\TP@maketitle{%
+   \begin{minipage}{0.01\linewidth}
+   \hfill
+   \end{minipage}%
+   \begin{minipage}{0.5\linewidth}
+        \color{titlefgcolor}
+        {\bfseries \LARGE \sc \@title \par}
+        {\Large \@author \par}
+        {\Large \@institute \par}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.07\linewidth}
+    	\centering
+           \@titlegraphic
+    \end{minipage}
+}
+\makeatother
+
+\tikzposterlatexaffectionproofoff
+
+%----------------------------------------------------------------------------------------
+% DEFINE COLORS
+%----------------------------------------------------------------------------------------
+
+\definecolor{mybluegreen}{RGB}{122, 205, 223}
+\definecolor{mygreyblue}{RGB}{219, 48, 122}
+\definecolor{mylightblue}{RGB}{165, 188, 210}
+\definecolor{mydarkgray}{RGB}{64, 79, 88}
+
+%----------------------------------------------------------------------------------------
+% START DOCUMENT
+%----------------------------------------------------------------------------------------
 
 \begin{document}
+\maketitle
 
+\begin{columns}
 
-\lipsum[1]
+\column{0.32}
+\block{Region EEZ Map with Inset}{%
+\begin{tikzfigure}[Caption with explanation of what it is.]
+\includegraphics[width=0.8\linewidth]{example-image}
+\end{tikzfigure}
+}
 
-  %----------------------------------------------------------------------------------------
-  %   EDUCATION
-  %----------------------------------------------------------------------------------------
+\column{0.38}
+\block{What is the Ocean Health Index?}{
+The Ocean Health Index (OHI) is a scientific framework used to measure how
+healthy oceans are. Understanding the state of our oceans is a first step towards
+ensuring they can continue providing humans benefits now and in the future.
+}
 
-<<>>=
-ggplot(mtcars[i,], aes(x = cyl, y = disp) ) + geom_point()
+\column{0.30}
+\block{2018 Assessment Results}{%
+\begin{tikzfigure}[Caption for the flower plot graph with explanation of what it is.]
+\includegraphics[width=0.8\linewidth]{example-image}
+\end{tikzfigure}
+}
+
+\end{columns}
+
+\begin{columns}
+
+\column{0.5}
+\block{OHI Goals}{
+\begin{itemize}
+\item[] \sc{Artisanal Opportunity}
+\item[] \sc{Biodiversity}
+\item[] \sc{Carbon Storage}
+\item[] \sc{Clean Water}
+\item[] \sc{Livelihoods and Economies}
+\item[] \sc{Coastal Protection}
+\item[] \sc{Food Provision}
+\item[] \sc{Natural Products}
+\item[] \sc{Sense of Place}
+\item[] \sc{Tourism and Recreation}
+\end{itemize}
+}
+
+\column{0.5}
+
+\block{Regional Goal Scores Over Time}{%
+\begin{Figure}
+<<rgn_testplot, dev="png">>=
+testplot
 @
+\end{Figure}
+}
+
+\end{columns}
 
 \end{document}
