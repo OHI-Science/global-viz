@@ -1,0 +1,121 @@
+\PassOptionsToPackage{svgnames}{xcolor}
+\documentclass{report}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usetikzlibrary{shadings,shadows}
+
+\usepackage[headheight=100mm, paperwidth=290.4mm, paperheight=215.9mm, textwidth=260mm, textheight=170mm]{geometry}
+\usepackage[fontsize=11pt]{scrextend}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{lipsum} % add nonsense text
+
+\usepackage{fancyhdr}
+\usepackage{color}
+
+%----------------------------------------------------------------------------------------
+% DEFINE COLORS
+%----------------------------------------------------------------------------------------
+
+\definecolor{mybluegreen}{RGB}{122, 205, 223}
+\definecolor{mygreyblue}{RGB}{219, 48, 122}
+\definecolor{mylightblue}{RGB}{165, 188, 210}
+\definecolor{mydarkgray}{RGB}{64, 79, 88}
+
+%----------------------------------------------------------------------------------------
+% SET KNIT OPTIONS
+%----------------------------------------------------------------------------------------
+
+<<knitr_options, echo=FALSE>>=
+opts_chunk$set(fig.width = 12, fig.height = 8, echo=FALSE)
+options(width = 60)
+set.seed(53079239)
+# install R packages if necessary:
+# if(!require("qtl")) install.packages("qtl", repos="http://cran.us.r-project.org")
+@
+
+%----------------------------------------------------------------------------------------
+% CREATE BOXES
+%----------------------------------------------------------------------------------------
+
+\newenvironment{blocktype1}[1]{%
+    \tcolorbox[beamer,%
+    noparskip,breakable,
+    colback=white,colframe=mydarkgray,%
+    colbacklower=mylightblue,%
+    title=#1]}%
+    {\endtcolorbox}
+    
+\newenvironment{blocktype2}[1]{%
+    \tcolorbox[beamer,%
+    noparskip,breakable,
+    colback=mybluegreen,colframe=mydarkgray,%
+    colbacklower=white,%
+    title=#1]}%
+    {\endtcolorbox}
+    
+\newenvironment{Figure}
+    {\par\medskip\noindent\minipage{\linewidth}}
+    {\endminipage\par\medskip}
+
+%----------------------------------------------------------------------------------------
+% HEADER INFO
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+\fancyfoot[RO,LE]{\thepage}
+
+\renewcommand{\headrulewidth}{2pt}
+\fancypagestyle{plain}{%
+  \fancyhead[L]{
+    \begin{tabular}{ll}
+      \begin{tabular}[t]{c}
+        \includegraphics[scale=0.3]{ohi_intro.png}%
+      \end{tabular} &
+      \begin{tabular}[b]{l}
+        \Sexpr{regioncard_title}\tabularnewline
+        National Center for Ecological Analysis and Synthesis\tabularnewline
+        \Sexpr{makedate}\tabularnewline
+      \end{tabular}
+    \end{tabular}   
+  }%
+}
+
+%----------------------------------------------------------------------------------------
+% START OF DOCUMENT
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\begin{multicols}{3}
+
+\section{Test}
+
+\lipsum[1-2]
+
+<<cmdline, echo=TRUE, eval=FALSE, tidy=FALSE>>=
+2*3*4*5 # can include code
+@
+
+\begin{Figure}
+<<rgn_testplot, dev="png">>=
+testplot
+@
+\end{Figure}
+
+
+\section{Test}
+\begin{blocktype1}{Example}
+\lipsum[2]
+\end{blocktype1}
+
+\begin{blocktype2}{Example}
+\lipsum[3]
+\end{blocktype2}
+
+\end{multicols}
+\end{document}
