@@ -1,0 +1,88 @@
+---
+title: "EEZ map for every OHI region"
+author: "Camila Vargas"
+date: "8/23/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document creates one global map for each region highlighting their EEZ and on "zoon-in" map per region indication their eez. This was done as part of the OHI global fellowship as an independent project.
+
+## Setup
+
+```{r}
+
+library(doParallel)
+library(rgdal)
+library(raster)
+library(sf)
+library(tidyverse)
+library(cowplot)
+library(ggmap)
+library(lwgeom)
+
+#setwd("~/github/global-viz/region_maps")
+
+```
+
+
+### Region "zoom-in" map
+For this maps we are going to use the low resolution shapefile find in [this folder](https://github.com/OHI-Science/ohiprep/tree/master/globalprep/spatial/downres) to extract the eex per country and adding a base map using ggmaps.
+
+```{r}
+## Read the shape fill for all regions and filter for eez (our area of interest for these maps)
+
+all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_low_res") %>%
+  dplyr::filter(rgn_typ == "eez") %>% 
+  dplyr::select(rgn_id, rgn_key, geometry)
+
+
+##validate the map so it can be ploted
+
+all_rgns <- st_make_valid(all_rgns)
+plot(all_rgns[1])
+
+
+
+## Forloop to creat a map for each region.
+
+
+
+
+```
+
+Before running the loop (and building the loop in this case Itested the method in one region, Chile)
+
+```{r}
+##Steps to creat each region map
+
+## 1. Filter region of interest from all_rgn 
+rgn_eez <- all_rgns %>%
+  dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
+
+## 2. Extract bounding box
+
+rgn_bbox <- as.matrix(st_bbox(rgn_eez))
+  
+
+## 3. Create the base map with the corresponding bbox
+rgn_loc <- rgn_bbox[1:4]
+rgn_bmap <- get_map(location = rgn_bbox, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
+
+plot(rgn_bmap)
+
+## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
+st_crs(rgn_eez) <- 4326
+rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
+plot(rgn_tans, col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2), bgMap = rgn_bmap)
+
+
+
+```
+
+
+
+
