@@ -1,0 +1,187 @@
+\documentclass[25pt,a1paper,landscape, margin=8mm, innermargin=5mm,
+blockverticalspace=6mm, colspace=5mm, subcolspace=8mm]{tikzposter}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+%----------------------------------------------------------------------------------------
+% TIKZPOSTER AND FONT OPTIONS + FIGURE ENVIRONMENT
+%----------------------------------------------------------------------------------------
+
+\usetheme{Desert}
+\usecolorstyle{Spain}
+\usetitlestyle{Filled}
+
+\usepackage{fontspec}
+\setmainfont{FreeSerif}
+\setsansfont{FreeSans}
+
+\newenvironment{Figure}
+    {\par\medskip\noindent\minipage{\linewidth}}
+    {\endminipage\par\medskip}
+
+%----------------------------------------------------------------------------------------
+% SET KNIT OPTIONS
+%----------------------------------------------------------------------------------------
+
+
+
+%----------------------------------------------------------------------------------------
+% HEADER INFORMATION AND FORMATTING
+%----------------------------------------------------------------------------------------
+
+\title{COUNTRYNAME : \hspace{8pt} Ocean Health Index Project Region Summary Card}
+\author{National Center for Ecological Analysis and Synthesis}
+\institute{Report Generated on Aug 22 2018}
+\titlegraphic{\includegraphics[width=\linewidth]{uploaded_figs/ohi_logo_gradient.png}}
+
+\makeatletter
+\renewcommand\TP@maketitle{%
+   \begin{minipage}{0.01\linewidth}
+   \hfill
+   \end{minipage}%
+   \begin{minipage}{0.5\linewidth}
+        \color{titlefgcolor}
+        {\bfseries \LARGE \sc \@title \par}
+        {\Large \@author \par}
+        {\Large \@institute \par}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.07\linewidth}
+    	\centering
+           \@titlegraphic
+    \end{minipage}
+}
+\makeatother
+
+\tikzposterlatexaffectionproofoff
+
+%----------------------------------------------------------------------------------------
+% DEFINE COLORS
+%----------------------------------------------------------------------------------------
+
+\definecolor{mybluegreen}{RGB}{122, 205, 223}
+\definecolor{mygreyblue}{RGB}{219, 48, 122}
+\definecolor{mylightblue}{RGB}{165, 188, 210}
+\definecolor{mydarkgray}{RGB}{64, 79, 88}
+
+%----------------------------------------------------------------------------------------
+% START DOCUMENT
+%----------------------------------------------------------------------------------------
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\maketitle
+
+\begin{columns}
+
+\column{0.32}
+\block{The Ocean Health Index (OHI) is a scientific framework used to measure how healthy oceans are. Understanding the state of our oceans is a first step towards ensuring they can continue providing humans benefits now and in the future. We define ocean health as the sustainable delivery of ten widely-held public goals for ocean ecosystems (Table 1). These goals represent the full suite of benefits that people want and need from the ocean.
+}{%
+\begin{tikzfigure}[Region map showing the corresponding EEZ on which the index is evaluated]
+\includegraphics[width=0.8\linewidth]{example-image}
+\end{tikzfigure}
+}
+
+\column{0.38}
+\block{The global OHI has been assessed every year since 2012. The primary goal of each yearly assessment is to calculate a new year of scores using the most recent data.  The flowerplot of goal sores (figure 2), petal representing an individual goal and petal lengths convey the score of the goal. Only goals that are relevant to a region are scored, otherwise they are set to NA with grey petals.
+}{%
+\begin{tikzfigure}[Goals and subgoals scores for rgn_name. All scores are on a scale from 0-100, and the center number is the region’s Index score, calculated by averaging the goal scores]
+\includegraphics[width=0.8\linewidth]{example-image}
+\end{tikzfigure}
+}
+
+\column{0.30}
+\block{The OHI is considered a composite indicator because it combines many indicators into a comprehensive framework describing ocean health. An Index score for 220 countries & territories, the Antarctic region, and 15 sections of the high seas, is calculated using existing global data. 
+}{%
+\begin{tikzfigure}[region_name is ranked number of the 221 EEZs]
+\includegraphics[width=0.8\linewidth]{example-image}
+\end{tikzfigure}
+}
+
+\end{columns}
+
+\begin{columns}
+
+\column{0.5}
+\block{OHI Goals}{
+\begin{itemize}
+\item[] \sc{Artisanal Opportunity (AO)} Opportunity for small-scale fishers to supply catch to local communities or sell in local market.
+\item[] \sc{Biodiversity (BD)} Conservation status of marine species and key habitats, which inform about the rest of species that depend on them.
+\item[] \sc{Carbon Storage (CS)} Condition of coastal habitats that store and sequester atmospheric carbon.
+\item[] \sc{Clean Water (CW)} Degree to which oceans are free of chemicals contaminants, excessive nutrients, human pathogens and trash.
+\item[] \sc{Livelihoods and Economies} Coastal and ocean-dependent livelihoods (job quantity and quality) and economies (revenues) produced by marine sectors.
+\item[] \sc{Coastal Protection (CP)} The amount of protection provided by marine and coastal habitats serving as natural buffers against incoming.
+\item[] \sc{Food Provision (FP)} The sustainable harvest of seafood from wild-caught fisheries and mariculture.
+\item[] \sc{Natural Products (NP)} The natural resources that are sustainably extracted from living marine resources.
+\item[] \sc{Sense of Place (SP)} The conservation status of iconic species and geographic locations that contribute to cultural identity.
+\item[] \sc{Tourism and Recreation (TR)} The value people have for experiencing and enjoying coastal areas and attractions.
+\end{itemize}
+}
+
+\column{0.5}
+
+\block{Regional Goal Scores Over Time}{%
+\begin{Figure}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Removed 14 rows containing missing values (geom\_path).}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Removed 14 rows containing missing values (geom\_point).}}\end{kframe}
+\includegraphics[width=\maxwidth]{figure/rgn_testplot-1} 
+
+\end{knitrout}
+\end{Figure}
+}
+
+\end{columns}
+
+\end{document}
