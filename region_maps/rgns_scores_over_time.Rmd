@@ -14,11 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(plotly)
-library(readr)
 library(cowplot)
 library(ggrepel)
 library(RColorBrewer)
-
+library(devtools)
+devtools::install_github("dill/beyonce")
+library(beyonce)
 
 ```
 
@@ -87,39 +88,57 @@ Writing steps of for loop to create figures for all countries
 ```{r}
 ## 1. Filter for the region - CHANGE CHILE FOR rgn_scores
 chile <- scores_description %>% 
-  dplyr::filter(region_id=='224') ## maybe ise i in the loop??
+  dplyr::filter(rgn_id=='224') ## maybe ise i in the loop??
 
 ## 2. Plot
 
-library(cowplot)
 chile_plot <- ggplot(chile %>%
                          filter(abb != "Index"),
                        aes(x = year, y = score, color = goal)) +
   geom_line(data = chile %>% 
               filter( abb == "Index"),
-            aes(x = year, y = score), size = 1.5, color = 'gray20', alpha = .9) +
+            aes(x = year, y = score), size = 1.8, color = 'gray20', alpha = 1) +
   geom_point(data = chile %>% 
               filter( abb == "Index"),
-            aes(x = year, y = score, text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 1.8, color = 'gray20', alpha = .9)+
+            aes(x = year, y = score, text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 2, color = 'gray20')+
   geom_text_repel(data= chile %>% 
                     filter( abb == "Index"),
-                    aes(label = label), na.rm=TRUE, nudge_x= 0.1, point.padding = unit(8, "points"), nudge_y = 0, size= 2, segment.color=NA, color = 'gray20')+
-  geom_line(aes(group = goal), alpha = .7, size = .8)+
-  geom_point(aes(text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 1)+
+                    aes(label = label), 
+                  na.rm=TRUE,
+                  fontface = 'bold',
+                  #hjust = 0,
+                  nudge_x= 0.01,
+                  nudge_y = 0.1,
+                  #direction = "y",
+                  point.padding = unit(8, "points"),
+                  size= 3, 
+                  segment.color=NA, 
+                  color = 'gray20')+
+  geom_line(aes(group = goal), alpha = 1, size = 1)+
+  geom_point(aes(text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 1.2)+
     scale_x_continuous(breaks = seq(2012, 2018, 1))+
   labs(y="Score", color = "Goal")+ 
-  theme_light()+
+  theme_cowplot()+
   theme(#axis.text.x = element_text(angle = 30),
         axis.title.x = element_blank(),
         legend.position = "None") +
-  geom_text_repel(aes(label = label), na.rm=TRUE, nudge_x= 0.1, point.padding = unit(8, "points"), nudge_y = 0, size=2, segment.color=NA) +
-  scale_color_viridis_d()+
+  geom_text_repel(aes(label = label),
+                  na.rm=TRUE,
+                  fontface = 'bold',
+                  nudge_x= 0.1,
+                  nudge_y = 0,
+                  point.padding = unit(8, "points"), 
+                  size= 3, 
+                  segment.color=NA) +
+  scale_color_brewer(palette = "Spectral")+
   guides(colour = guide_legend(override.aes = list(size = 3)))
 
 plot(chile_plot)
 
+##Plotly for website. NOTE: ggrapel does not show up in the plotly
 
-
+ggplotly(chile_plot, tooltip="text") %>% 
+  config(displayModeBar = F)
 
 
 ```

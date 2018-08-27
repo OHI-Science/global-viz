@@ -28,6 +28,7 @@ source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2018/master/src/R
 
 #setwd("~/github/global-viz/region_maps")
 
+
 ```
 
 
@@ -39,7 +40,8 @@ For this maps we are going to use the low resolution shapefile find in [this fol
 
 all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_med_res") %>%
   dplyr::filter(rgn_typ == "eez") %>% 
-  dplyr::select(rgn_id, rgn_key, geometry)
+  dplyr::select(rgn_id, rgn_key, geometry) %>% 
+  dplyr::arrange(rgn_id)
 
 
 ##validate the map so it can be ploted
@@ -55,6 +57,9 @@ plot(all_rgns[1])
 
 
 ```
+
+
+
 
 ### Test with on region
 
@@ -83,14 +88,7 @@ plot(rgn_bmap)
 st_crs(rgn_eez) <- 4326
 rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
 plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
-plot(st_geometry(rgn_tans), bgMap = rgn_bmap)
 
-ggmap(rgn_bmap)+
-  geom_sf(data= rgn_tans )
-
-
-ggplot()+
-  geom_sf(data= rgn_tans)
 
 ```
 
@@ -138,6 +136,72 @@ for (region in region_list$rgn_name[1:5]) {
 ```
 
 
+## Diferent approach using ggmap adn ggplot
+
+```{r}
+
+all_rgns <- regions %>% 
+  dplyr::filter(rgn_type == "eez") %>% 
+  dplyr::select(rgn_id, rgn_key, geometry) %>% 
+  dplyr::arrange(rgn_id)
+
+
+
+sf::st_crs(all_rgns) <- "+proj=longlat"
+# now that you have the correct epsg set, reproject to 4326
+all_rgns_repr = st_transform(all_rgns, 4326)
+
+
+## trying different let long projections
+# http://www.spatialreference.org/ref/esri/102718/proj4/
+#+proj=lcc +lat_1=40.66666666666666 +lat_2=41.03333333333333 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs 
+
+"+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+
+
+##Steps to creat each region map
+
+## 1. Filter region of interest from all_rgn 
+rgn_eez <- all_rgns_repr %>%
+  dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
+
+plot(rgn_eez[2])
+
+## 2. Extract bounding box
+
+rgn_bbox <- as.matrix(st_bbox(rgn_eez))
+  
+
+## 3. Create the base map with the corresponding bbox
+rgn_loc <- rgn_bbox[1:4]
+rgn_bmap <- get_map(location = rgn_bbox, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
+
+plot(rgn_bmap)
+
+## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
+st_crs(rgn_eez) <- 4326
+rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
+plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
+plot(st_geometry(rgn_tans), bgMap = rgn_bmap)
+
+
+
+
+data <- fortify(shapefile)
+
+qmap('chile', zoom = 3, maptype = 'satellite') +
+geom_sf(data = rgn_eez,
+colour = 'white', fill = 'black', alpha = .4, size = .3)
+
+test <- qmap('chile', zoom = 3, maptype = 'satellite')+
+  geom_sf(mapping = aes(), data= rgn_eez)
+
+
+plot(test)
+
+
+
+```
 
 
 
