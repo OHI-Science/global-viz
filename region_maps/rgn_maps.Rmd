@@ -24,6 +24,8 @@ library(cowplot)
 library(ggmap)
 library(lwgeom)
 
+source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2018/master/src/R/spatial_common.R')
+
 #setwd("~/github/global-viz/region_maps")
 
 ```
@@ -35,7 +37,7 @@ For this maps we are going to use the low resolution shapefile find in [this fol
 ```{r}
 ## Read the shape fill for all regions and filter for eez (our area of interest for these maps)
 
-all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_low_res") %>%
+all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_med_res") %>%
   dplyr::filter(rgn_typ == "eez") %>% 
   dplyr::select(rgn_id, rgn_key, geometry)
 
@@ -54,6 +56,8 @@ plot(all_rgns[1])
 
 ```
 
+### Test with on region
+
 Before running the loop (and building the loop in this case Itested the method in one region, Chile)
 
 ```{r}
@@ -62,6 +66,7 @@ Before running the loop (and building the loop in this case Itested the method i
 ## 1. Filter region of interest from all_rgn 
 rgn_eez <- all_rgns %>%
   dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
+
 
 ## 2. Extract bounding box
 
@@ -77,11 +82,68 @@ plot(rgn_bmap)
 ## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
 st_crs(rgn_eez) <- 4326
 rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
-plot(rgn_tans, col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2), bgMap = rgn_bmap)
+plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
+plot(st_geometry(rgn_tans), bgMap = rgn_bmap)
+
+ggmap(rgn_bmap)+
+  geom_sf(data= rgn_tans )
 
 
+ggplot()+
+  geom_sf(data= rgn_tans)
 
 ```
+
+
+## Ceating inset maps for each region
+The inset map is a map of the world highlighting each region eez.
+
+```{r}
+
+## Wrangle region object imported from spatiol_common.R
+regions <- as(regions, "Spatial")
+land <- regions[regions$rgn_type %in% c("land", "land-disputed", "land-noeez"), ]
+
+# function to plot general regions
+plot_rgn <- function(rgn){ #rgn="New Zealand"
+  rgn_area <- regions[regions$rgn_name == rgn, ]  
+  png(filename =str_to_lower(sprintf("figures/inset_maps/%s.png",str_replace(rgn, pattern = " ","_"))), res=500, width=7, height=7, units="in")
+  plot(regions, col='#e3e7ea', border=NA)
+  plot(land, col='gray85', border='grey80', add=TRUE, lwd=0.5)
+  plot(rgn_area, col="red", border="red", add=TRUE)
+  dev.off()
+}
+
+## Test the function for one region
+plot_rgn("Chile")
+
+
+##List with region names to loop over and create one inset map per region
+region_list <- read_csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv") 
+
+##Loop through and save one map per region as a png
+for (region in region_list$rgn_name[1:5]) {
+ 
+  print(region)
+  
+  plot_rgn(rgn = region)  
+}
+```
+
+
+## Combine both inset and zoom in region
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
 
 
 
