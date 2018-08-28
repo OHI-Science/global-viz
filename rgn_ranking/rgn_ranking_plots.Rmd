@@ -65,6 +65,10 @@ Prapare the data frame for plotting. In this case the ranking is ploted based on
 
 
 ```{r}
+##Keep in mind this palette - flower plot
+#display.brewer.pal(11,"RdYlBu")
+#brewer.pal(11,"RdYlBu")
+
 rank_plot <- ggplot()+
   geom_bar(data = rank %>% 
              filter(rgn_id != 224),

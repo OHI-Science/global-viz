@@ -31,7 +31,7 @@ Prapare the data frame for plotting
 
 ##Read in the socres
 scores <- read.csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv') %>%
-  rename(abb = "goal")
+  rename(abb = "goal", rgn_id = "region_id")
 
 
 #Goals Description according to "short version" 

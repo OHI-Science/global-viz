@@ -87,8 +87,9 @@ plot(rgn_bmap)
 ## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
 st_crs(rgn_eez) <- 4326
 rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
-plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
-
+png(filename ="figures/chile_eez.png", res=500, width=7, height=7, units="in", bg= "transparent")
+plot_eez <- plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
+dev.off()
 
 ```
 
@@ -105,10 +106,10 @@ land <- regions[regions$rgn_type %in% c("land", "land-disputed", "land-noeez"), 
 # function to plot general regions
 plot_rgn <- function(rgn){ #rgn="New Zealand"
   rgn_area <- regions[regions$rgn_name == rgn, ]  
-  png(filename =str_to_lower(sprintf("figures/inset_maps/%s.png",str_replace(rgn, pattern = " ","_"))), res=500, width=7, height=7, units="in")
+  png(filename =str_to_lower(sprintf("figures/inset_maps/%s.png",str_replace(rgn, pattern = " ","_"))), res=500, width=7, height=7, units="in", bg= "transparent")
   plot(regions, col='#e3e7ea', border=NA)
   plot(land, col='gray85', border='grey80', add=TRUE, lwd=0.5)
-  plot(rgn_area, col="red", border="red", add=TRUE)
+  plot(rgn_area, col="#313695", border="#313695", add=TRUE)
   dev.off()
 }
 
@@ -133,79 +134,39 @@ for (region in region_list$rgn_name[1:5]) {
 
 ```{r}
 
-```
+library(magick)
 
-
-## Diferent approach using ggmap adn ggplot
-
-```{r}
-
-all_rgns <- regions %>% 
-  dplyr::filter(rgn_type == "eez") %>% 
-  dplyr::select(rgn_id, rgn_key, geometry) %>% 
-  dplyr::arrange(rgn_id)
-
-
-
-sf::st_crs(all_rgns) <- "+proj=longlat"
-# now that you have the correct epsg set, reproject to 4326
-all_rgns_repr = st_transform(all_rgns, 4326)
-
-
-## trying different let long projections
-# http://www.spatialreference.org/ref/esri/102718/proj4/
-#+proj=lcc +lat_1=40.66666666666666 +lat_2=41.03333333333333 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs 
-
-"+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-
-
-##Steps to creat each region map
-
-## 1. Filter region of interest from all_rgn 
-rgn_eez <- all_rgns_repr %>%
-  dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
-
-plot(rgn_eez[2])
-
-## 2. Extract bounding box
-
-rgn_bbox <- as.matrix(st_bbox(rgn_eez))
+eez <- ggdraw()+
+  draw_image("figures/chile_eez.png")
   
+inset <- ggdraw()+
+  draw_image("figures/chile_eez.png")+
+  draw_image("figures/inset_maps/chile.png", scale = 0.3)
 
-## 3. Create the base map with the corresponding bbox
-rgn_loc <- rgn_bbox[1:4]
-rgn_bmap <- get_map(location = rgn_bbox, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
+plot_grid(inset, eez)
 
-plot(rgn_bmap)
-
-## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
-st_crs(rgn_eez) <- 4326
-rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
-plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
-plot(st_geometry(rgn_tans), bgMap = rgn_bmap)
+ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point(size = 3) +
+    draw_image("figures/chile_eez.png") +
+    draw_image(img2, x = 2, y = 2, scale = .9)
 
 
 
 
-data <- fortify(shapefile)
+img <- magick::image_read("http://jeroen.github.io/images/tiger.svg")
+  img <- magick::image_transparent(img, color = "white")
+  img2 <- magick::image_negate(img)
+  ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point(size = 3) +
+    geom_abline(slope = 1, intercept = 0, linetype = 2, color = "blue") +
+    draw_image(img , x = 1, y = 1, scale = .9) +
+    draw_image(img2, x = 2, y = 2, scale = .9)
 
-qmap('chile', zoom = 3, maptype = 'satellite') +
-geom_sf(data = rgn_eez,
-colour = 'white', fill = 'black', alpha = .4, size = .3)
 
-test <- qmap('chile', zoom = 3, maptype = 'satellite')+
-  geom_sf(mapping = aes(), data= rgn_eez)
-
-
-plot(test)
 
 
 
 ```
-
-
-
-
 
 
 
