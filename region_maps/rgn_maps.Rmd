@@ -1,0 +1,179 @@
+---
+title: "EEZ map for every OHI region"
+author: "Camila Vargas"
+date: "8/23/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document creates one global map for each region highlighting their EEZ and on "zoon-in" map per region indication their eez. This was done as part of the OHI global fellowship as an independent project.
+
+## Setup
+
+```{r}
+
+library(doParallel)
+library(rgdal)
+library(raster)
+library(sf)
+library(tidyverse)
+library(cowplot)
+library(ggmap)
+library(lwgeom)
+
+source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2018/master/src/R/spatial_common.R')
+
+#setwd("~/github/global-viz/region_maps")
+
+
+```
+
+
+### Region "zoom-in" map
+For this maps we are going to use the low resolution shapefile find in [this folder](https://github.com/OHI-Science/ohiprep/tree/master/globalprep/spatial/downres) to extract the eex per country and adding a base map using ggmaps.
+
+```{r}
+## Read the shape fill for all regions and filter for eez (our area of interest for these maps)
+
+all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_med_res") %>%
+  dplyr::filter(rgn_typ == "eez") %>% 
+  dplyr::select(rgn_id, rgn_key, geometry) %>% 
+  dplyr::arrange(rgn_id)
+
+
+##validate the map so it can be ploted
+
+all_rgns <- st_make_valid(all_rgns)
+plot(all_rgns[1])
+
+
+
+## Forloop to creat a map for each region.
+
+
+
+
+```
+
+
+
+
+### Test with on region
+
+Before running the loop (and building the loop in this case Itested the method in one region, Chile)
+
+```{r}
+##Steps to creat each region map
+
+## 1. Filter region of interest from all_rgn 
+rgn_eez <- all_rgns %>%
+  dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
+
+
+## 2. Extract bounding box
+
+rgn_bbox <- as.matrix(st_bbox(rgn_eez))
+  
+
+## 3. Create the base map with the corresponding bbox
+rgn_loc <- rgn_bbox[1:4]
+rgn_bmap <- get_map(location = rgn_bbox, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
+
+plot(rgn_bmap)
+
+## 4. Plot the eex and the base map. It is importatnt to do the CRS trasformation right before ploting both maps together in order to work.
+st_crs(rgn_eez) <- 4326
+rgn_tans <- st_transform(rgn_eez, crs = 3857)[1]
+png(filename ="figures/chile_eez.png", res=500, width=7, height=7, units="in", bg= "transparent")
+plot_eez <- plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
+dev.off()
+
+```
+
+
+## Ceating inset maps for each region
+The inset map is a map of the world highlighting each region eez.
+
+```{r}
+
+## Wrangle region object imported from spatiol_common.R
+regions <- as(regions, "Spatial")
+land <- regions[regions$rgn_type %in% c("land", "land-disputed", "land-noeez"), ]
+
+# function to plot general regions
+plot_rgn <- function(rgn){ #rgn="New Zealand"
+  rgn_area <- regions[regions$rgn_name == rgn, ]  
+  png(filename =str_to_lower(sprintf("figures/inset_maps/%s.png",str_replace(rgn, pattern = " ","_"))), res=500, width=7, height=7, units="in", bg= "transparent")
+  plot(regions, col='#e3e7ea', border=NA)
+  plot(land, col='gray85', border='grey80', add=TRUE, lwd=0.5)
+  plot(rgn_area, col="#313695", border="#313695", add=TRUE)
+  dev.off()
+}
+
+## Test the function for one region
+plot_rgn("Chile")
+
+
+##List with region names to loop over and create one inset map per region
+region_list <- read_csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv") 
+
+##Loop through and save one map per region as a png
+for (region in region_list$rgn_name[1:5]) {
+ 
+  print(region)
+  
+  plot_rgn(rgn = region)  
+}
+```
+
+
+## Combine both inset and zoom in region
+
+```{r}
+
+library(magick)
+
+eez <- ggdraw()+
+  draw_image("figures/chile_eez.png")
+  
+inset <- ggdraw()+
+  draw_image("figures/chile_eez.png", x = 0, y = 0, width = 1, height = 1, scale = 1)+
+  draw_image("figures/inset_maps/chile.png",scale = 0.6, clip="on")
+
+##Thought:
+##Both images have the same hight and width. See where they where saves. So next step can by trying to remove the "transparent" space of the inset map and then try the draw image scale..
+
+
+plot_grid(inset, eez)
+
+ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point(size = 3) +
+    draw_image("figures/chile_eez.png") +
+    draw_image(img2, x = 2, y = 2, scale = .9)
+
+
+
+
+img <- magick::image_read("http://jeroen.github.io/images/tiger.svg")
+  img <- magick::image_transparent(img, color = "white")
+  img2 <- magick::image_negate(img)
+  ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
+    geom_point(size = 3) +
+    geom_abline(slope = 1, intercept = 0, linetype = 2, color = "blue") +
+    draw_image(img , x = 1, y = 1, scale = .9) +
+    draw_image(img2, x = 2, y = 2, scale = .9)
+
+
+
+
+
+```
+
+
+
+
+
+

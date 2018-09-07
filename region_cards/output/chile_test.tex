@@ -1,5 +1,55 @@
 \documentclass[14pt,a1paper,landscape, margin=8mm, innermargin=5mm,
-blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
+blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 
 %----------------------------------------------------------------------------------------
 % TIKZPOSTER AND FONT OPTIONS + FIGURE ENVIRONMENT
@@ -40,19 +90,15 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 % SET KNIT OPTIONS
 %----------------------------------------------------------------------------------------
 
-<<knitr_options, echo=FALSE>>=
-opts_chunk$set(echo = FALSE)
-# install R packages if necessary:
-# if(!require("ggplot")) install.packages("ggplot")
-@
+
 
 %----------------------------------------------------------------------------------------
 % HEADER INFORMATION AND FORMATTING
 %----------------------------------------------------------------------------------------
 
-\title{\Sexpr{regioncard_title} : \hspace{8pt} Ocean Health Index Project Region Summary Card}
+\title{COUNTRYNAME : \hspace{8pt} Ocean Health Index Project Region Summary Card}
 \author{National Center for Ecological Analysis and Synthesis}
-\institute{Report Generated on \Sexpr{makedate}}
+\institute{Report Generated on Sep 06 2018}
 \titlegraphic{\includegraphics[width=\linewidth]{uploaded_figs/ohi_logo_gradient.png}}
 
 \makeatletter
@@ -88,7 +134,7 @@ opts_chunk$set(echo = FALSE)
 %----------------------------------------------------------------------------------------
 % START DOCUMENT
 %----------------------------------------------------------------------------------------
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 \maketitle
 
@@ -119,9 +165,14 @@ opts_chunk$set(echo = FALSE)
 }}
 {%
 \begin{figure}[region_nameis ranked N of the 220 EEZs.]
-<<rgn_rankplot, dev="png">>=
-rank_plot
-@
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Removed 1 rows containing missing values (position\_stack).}}\end{kframe}
+\includegraphics[width=\maxwidth]{figure/rgn_rankplot-1} 
+
+\end{knitrout}
 \end{figure}
 }
 
@@ -153,9 +204,16 @@ rank_plot
 \item[]{Every year, previous scores are re-calculated with the most recent methods.}}
 {%
 \begin{Figure}[Scores over time using the 2018 methods.]
-<<rgn_testplot, dev="png">>=
-chile_plot
-@
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Removed 14 rows containing missing values (geom\_path).}}
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: Removed 14 rows containing missing values (geom\_point).}}\end{kframe}
+\includegraphics[width=\maxwidth]{figure/rgn_testplot-1} 
+
+\end{knitrout}
 \end{Figure}
 }
 
