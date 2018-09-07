@@ -140,8 +140,12 @@ eez <- ggdraw()+
   draw_image("figures/chile_eez.png")
   
 inset <- ggdraw()+
-  draw_image("figures/chile_eez.png")+
-  draw_image("figures/inset_maps/chile.png", scale = 0.3)
+  draw_image("figures/chile_eez.png", x = 0, y = 0, width = 1, height = 1, scale = 1)+
+  draw_image("figures/inset_maps/chile.png",scale = 0.6, clip="on")
+
+##Thought:
+##Both images have the same hight and width. See where they where saves. So next step can by trying to remove the "transparent" space of the inset map and then try the draw image scale..
+
 
 plot_grid(inset, eez)
 

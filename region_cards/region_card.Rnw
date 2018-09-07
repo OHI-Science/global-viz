@@ -1,13 +1,32 @@
-\documentclass[25pt,a1paper,landscape, margin=8mm, innermargin=5mm,
-blockverticalspace=6mm, colspace=5mm, subcolspace=8mm]{tikzposter}
+\documentclass[14pt,a1paper,landscape, margin=8mm, innermargin=5mm,
+blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 
 %----------------------------------------------------------------------------------------
 % TIKZPOSTER AND FONT OPTIONS + FIGURE ENVIRONMENT
 %----------------------------------------------------------------------------------------
 
 \usetheme{Desert}
-\usecolorstyle{Spain}
+\usecolorstyle[colorPalette= BlueGrayOrange]{Spain}
 \usetitlestyle{Filled}
+
+%\usebackgroundstyle{Default} %defines the background of the whole poster
+
+%Getting rid of the grading of the title box
+\defineblockstyle{Slide}{
+    titlewidthscale=1, bodywidthscale=1, titleleft,
+    titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0pt, bodyoffsety=0pt,
+    bodyverticalshift=0pt, roundedcorners=0, linewidth=0pt, titleinnersep=1cm,
+    bodyinnersep=1cm
+}{
+    \ifBlockHasTitle%
+        % changed "right color=..,left color=.." to "fill=blocktitlebgcolor"
+        \draw[draw=none, fill=blocktitlebgcolor] 
+           (blocktitle.south west) rectangle (blocktitle.north east);
+    \fi%
+    \draw[draw=none, fill=blockbodybgcolor] %
+        (blockbody.north west) [rounded corners=30] -- (blockbody.south west) --
+        (blockbody.south east) [rounded corners=0]-- (blockbody.north east) -- cycle;
+}
 
 \usepackage{fontspec}
 \setmainfont{FreeSerif}
@@ -34,7 +53,7 @@ opts_chunk$set(echo = FALSE)
 \title{\Sexpr{regioncard_title} : \hspace{8pt} Ocean Health Index Project Region Summary Card}
 \author{National Center for Ecological Analysis and Synthesis}
 \institute{Report Generated on \Sexpr{makedate}}
-\titlegraphic{\includegraphics[width=\linewidth]{uploaded_figs/ohi_intro.png}}
+\titlegraphic{\includegraphics[width=\linewidth]{uploaded_figs/ohi_logo_gradient.png}}
 
 \makeatletter
 \renewcommand\TP@maketitle{%
@@ -61,10 +80,10 @@ opts_chunk$set(echo = FALSE)
 % DEFINE COLORS
 %----------------------------------------------------------------------------------------
 
-\definecolor{mybluegreen}{RGB}{122, 205, 223}
-\definecolor{mygreyblue}{RGB}{219, 48, 122}
-\definecolor{mylightblue}{RGB}{165, 188, 210}
-\definecolor{mydarkgray}{RGB}{64, 79, 88}
+%\definecolor{mybluegreen}{RGB}{122, 205, 223}
+%\definecolor{mygreyblue}{RGB}{219, 48, 122}
+%\definecolor{mylightblue}{RGB}{165, 188, 210}
+%\definecolor{mydarkgray}{RGB}{64, 79, 88}
 
 %----------------------------------------------------------------------------------------
 % START DOCUMENT
@@ -75,25 +94,35 @@ opts_chunk$set(echo = FALSE)
 
 \begin{columns}
 
-\column{0.32}
-\block{Region EEZ Map with Inset}{%
-\begin{tikzfigure}[Caption with explanation of what it is.]
-\includegraphics[width=0.8\linewidth]{example-image}
+\column{0.33}
+\block{\textbf{\textsc{What is the Ocean Health Index (OHI?}}
+\item[]{The OHI is a scientific framework used to measure how healthy oceans are. Understanding the state of our oceans is a first step towards ensuring they can continue providing humans benefits now and in the future. }}
+{%
+\begin{tikzfigure}[Region map showing the corresponding EEZ on which the index is evaluated.]
+\includegraphics[width=0.8\linewidth]{../region_maps/figures/inset_maps/chile.png}
 \end{tikzfigure}
 }
 
-\column{0.38}
-\block{What is the Ocean Health Index?}{
-The Ocean Health Index (OHI) is a scientific framework used to measure how
-healthy oceans are. Understanding the state of our oceans is a first step towards
-ensuring they can continue providing humans benefits now and in the future.
+\column{0.34}
+\block{\textbf{\textsc{Why is it important?}}
+\item[] {The ocean plays a critical role in supporting human well-being from providing food to regulating global climate. This index provides a powerful tool to raise public awareness, direct resource management, improve policy and prioritize scientific research. 
+}}
+{%
+\begin{tikzfigure}[Goals and subgoals scores for Chile. All scores are on a scale from 0-100, and the center number is the region’s Index score, calculated by averaging the goal scores.]
+\includegraphics[width=0.8\linewidth]{../../ohi-global/global2017/Results/figures/FlowerPlots/flower_Chile.png}
+\end{tikzfigure}
 }
 
-\column{0.30}
-\block{2018 Assessment Results}{%
-\begin{tikzfigure}[Caption for the flower plot graph with explanation of what it is.]
-\includegraphics[width=0.8\linewidth]{example-image}
-\end{tikzfigure}
+\column{0.33}
+\block{\textbf{\textsc{How is it calculated?}}
+\item[] {The OHI combines many indicators into a comprehensive framework describing ocean health. An Index score for 220 countries and territories, the Antarctic region, is calculated every year, using best global data available.
+}}
+{%
+\begin{figure}[region_nameis ranked N of the 220 EEZs.]
+<<rgn_rankplot, dev="png">>=
+rank_plot
+@
+\end{figure}
 }
 
 \end{columns}
@@ -101,27 +130,31 @@ ensuring they can continue providing humans benefits now and in the future.
 \begin{columns}
 
 \column{0.5}
-\block{OHI Goals}{
+\block{\textbf{\textsc{OHI Goals}}
+\item[] {Ocean health is defined as the sustainable delivery of ten widely-held public goals for ocean ecosystems}}
+{
 \begin{itemize}
-\item[] \sc{Artisanal Opportunity}
-\item[] \sc{Biodiversity}
-\item[] \sc{Carbon Storage}
-\item[] \sc{Clean Water}
-\item[] \sc{Livelihoods and Economies}
-\item[] \sc{Coastal Protection}
-\item[] \sc{Food Provision}
-\item[] \sc{Natural Products}
-\item[] \sc{Sense of Place}
-\item[] \sc{Tourism and Recreation}
+\item[] \textbf{\textsc{Artisanal Opportunity (AO)}} Opportunity for small-scale fishers to supply catch to local communities or sell in local market.
+\item[] \textbf{\textsc{Biodiversity (BD)}} Conservation status of marine species and key habitats, which inform about the rest of species that depend on them.
+\item[] \textbf{\textsc{Carbon Storage (CS)}} Condition of coastal habitats that store and sequester atmospheric carbon.
+\item[] \textbf{\textsc{Clean Water (CW)}} Degree to which oceans are free of chemicals contaminants, excessive nutrients, human pathogens and trash.
+\item[] \textbf{\textsc{Livelihoods and Economies (LE)}} Coastal and ocean-dependent livelihoods (job quantity and quality) and economies (revenues) produced by marine sectors.
+\item[] \textbf{\textsc{Coastal Protection (CP)}} The amount of protection provided by marine and coastal habitats serving as natural buffers against incoming.
+\item[] \textbf{\textsc{Food Provision (FP)}} The sustainable harvest of seafood from wild-caught fisheries and mariculture.
+\item[] \textbf{\textsc{Natural Products (NP)}} The natural resources that are sustainably extracted from living marine resources.
+\item[] \textbf{\textsc{Sense of Place (SP)}} The conservation status of iconic species and geographic locations that contribute to cultural identity.
+\item[] \textbf{\textsc{Tourism and Recreation (TR)}} The value people have for experiencing and enjoying coastal areas and attractions.
 \end{itemize}
 }
 
 \column{0.5}
 
-\block{Regional Goal Scores Over Time}{%
-\begin{Figure}
+\block{\textbf{\textsc{Regional Goal Scores Over Time}} 
+\item[]{Every year, previous scores are re-calculated with the most recent methods.}}
+{%
+\begin{Figure}[Scores over time using the 2018 methods.]
 <<rgn_testplot, dev="png">>=
-testplot
+chile_plot
 @
 \end{Figure}
 }
