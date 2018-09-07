@@ -50,8 +50,9 @@ opts_chunk$set(echo = FALSE)
 % HEADER INFORMATION AND FORMATTING
 %----------------------------------------------------------------------------------------
 
-\title{\textbf{\textsc{NAME OF REGION HERE}  - \hspace{8pt}Ocean Health Index Project Region Summary Card}}
+\title{\textbf{\textsc{\Sexpr{regioncard_title}}  - \hspace{8pt}Ocean Health Index Project Region Summary Card}}
 \institute{National Center for Ecological Analysis and Synthesis}
+\author{Generated: \Sexpr{makedate}}
 \titlegraphic{\includegraphics[width=0.7\linewidth]{uploaded_figs/ohi_logo_gradient.png}}
 
 \makeatletter
@@ -125,9 +126,11 @@ opts_chunk$set(echo = FALSE)
 \item[] {The OHI combines many indicators into a comprehensive framework describing ocean health. An Index score for 220 countries and territories, the Antarctic region, is calculated every year, using best global data available.
 }}
 {%
-\begin{tikzfigure}[Caption for the flower plot graph with explanation of what it is.]
-\includegraphics[width=0.8\linewidth]{example-image}
-\end{tikzfigure}
+\begin{Figure}[Scores over time using the 2018 methods.]
+<<rgn_testplot, dev="png">>=
+rgn_flowerplot
+@
+\end{Figure}
 }
 
 \end{columns}

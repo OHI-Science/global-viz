@@ -5,6 +5,7 @@ library(stringr)
 library(tidyverse)
 library(ggrepel) # install.packages("ggrepel")
 library(cowplot) # install.packages("cowplot")
+library(magick) # install.packages("magick")
 
 ## setwd and define paths for outputs etc
 setwd("./region_cards")
@@ -59,7 +60,7 @@ scores_description <- scores %>%
 
 
 ## create the cards!
-for(rgn in region_names$rgn_id){ # for(rgn in c(16, 224, 70))
+for(rgn in c(16, 224, 70)){ # for(rgn in region_names$rgn_id){
   
   ## subset score data for country/region
   rgn_score_data <- scores_description %>% 
@@ -108,15 +109,22 @@ for(rgn in region_names$rgn_id){ # for(rgn in c(16, 224, 70))
                     size = 3, 
                     segment.color = NA) +
     scale_color_brewer(palette = "Spectral") +
-    guides(colour = guide_legend(override.aes = list(size = 3)))
+    guides(colour = guide_legend(override.aes = list(size = 3))) +
+    coord_fixed(1/30) # to adjust aspect ratio for fitting in card 'block'
   
   
   ## select region inset map png from list of files in region maps folder
   inset_maps <- list.files("../region_maps/figures/inset_maps", full.names = TRUE)
   region_inset_map <- inset_maps[gsub(".png", "", basename(inset_maps)) == filename]
   
+  
+  ## flowerplots
+  flowerplot_github <- "https://github.com/OHI-Science/ohi-global/tree/draft/global2017/Results/figures/FlowerPlots/"
+  rgn_flowerplot_path <- paste0(flowerplot_github, "flower_", str_replace_all(regioncard_title, " ", ""), ".png")
+  rgn_flowerplot <- image_read(rgn_flowerplot_path)
+  
+  
   ## knit the card together
   knit2pdf(input  = "region_card_v2.Rnw", output = paste0("output/", filename, ".tex"), compiler = "xelatex")
-  
   
 }
