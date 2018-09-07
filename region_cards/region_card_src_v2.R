@@ -59,7 +59,7 @@ scores_description <- scores %>%
 
 
 ## create the cards!
-for(i in region_names$rgn_id){ # for(rgn in c(16, 224, 70))
+for(rgn in region_names$rgn_id){ # for(rgn in c(16, 224, 70))
   
   ## subset score data for country/region
   rgn_score_data <- scores_description %>% 
