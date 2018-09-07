@@ -1,9 +1,16 @@
 \documentclass[14pt,a1paper,landscape, margin=8mm, innermargin=5mm,
 blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
+
+%----------------------------------------------------------------------------------------
+% TIKZPOSTER AND FONT OPTIONS + FIGURE ENVIRONMENT
+%----------------------------------------------------------------------------------------
+
 \usetheme{Desert}
 \usecolorstyle[colorPalette= BlueGrayOrange]{Spain}
 \usetitlestyle{Filled}
+
 %\usebackgroundstyle{Default} %defines the background of the whole poster
+
 %Getting rid of the grading of the title box
 \defineblockstyle{Slide}{
     titlewidthscale=1, bodywidthscale=1, titleleft,
@@ -25,9 +32,27 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 \setmainfont{FreeSerif}
 \setsansfont{FreeSans}
 
+\newenvironment{Figure}
+    {\par\medskip\noindent\minipage{\linewidth}}
+    {\endminipage\par\medskip}
+
+%----------------------------------------------------------------------------------------
+% SET KNIT OPTIONS
+%----------------------------------------------------------------------------------------
+
+<<knitr_options, echo=FALSE>>=
+opts_chunk$set(echo = FALSE)
+# install R packages if necessary:
+# if(!require("ggplot")) install.packages("ggplot")
+@
+
+%----------------------------------------------------------------------------------------
+% HEADER INFORMATION AND FORMATTING
+%----------------------------------------------------------------------------------------
+
 \title{\textbf{\textsc{NAME OF REGION HERE}  - \hspace{8pt}Ocean Health Index Project Region Summary Card}}
 \institute{National Center for Ecological Analysis and Synthesis}
-\titlegraphic{\includegraphics[width=0.6\linewidth]{example-image}}
+\titlegraphic{\includegraphics[width=0.7\linewidth]{uploaded_figs/ohi_logo_gradient.png}}
 
 \makeatletter
 \renewcommand\TP@maketitle{%
@@ -40,7 +65,7 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
         {\Large \@institute \par}
     \end{minipage}%
    \hfill
-    \begin{minipage}{0.07\linewidth}
+    \begin{minipage}{0.09\linewidth}
     	\centering
            \@titlegraphic
     \end{minipage}
@@ -49,8 +74,25 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 
 \tikzposterlatexaffectionproofoff
 
+%----------------------------------------------------------------------------------------
+% DEFINE COLORS
+%----------------------------------------------------------------------------------------
+
+%\definecolor{mybluegreen}{RGB}{122, 205, 223}
+%\definecolor{mygreyblue}{RGB}{219, 48, 122}
+%\definecolor{mylightblue}{RGB}{165, 188, 210}
+%\definecolor{mydarkgray}{RGB}{64, 79, 88}
+
+%----------------------------------------------------------------------------------------
+% START DOCUMENT
+%----------------------------------------------------------------------------------------
+
 \begin{document}
 \maketitle
+
+%----------------------------------------------------------------------------------------
+% FIRST ROW
+%----------------------------------------------------------------------------------------
 
 \begin{columns}
 
@@ -59,7 +101,7 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 %\colorlet{blocktitlebgcolor}{blue!40} %changes color of the "title" box
 %\useblockstyle{Basic} %set blocks to a basic style (round corners, solid title...)
 
-\block{\textbf{\textsc{What is the Ocean Health Index (OHI?}}
+\block{\textbf{\textsc{What is the Ocean Health Index (OHI)?}}
 \item[]{The OHI is a scientific framework used to measure how healthy oceans are. Understanding the state of our oceans is a first step towards ensuring they can continue providing humans benefits now and in the future.}}
 {%
 
@@ -90,6 +132,10 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 
 \end{columns}
 
+%----------------------------------------------------------------------------------------
+% SECOND ROW
+%----------------------------------------------------------------------------------------
+
 \begin{columns}
 \column{0.5}
 \block{\textbf{\textsc{OHI Goals}}
@@ -114,11 +160,17 @@ blockverticalspace=4mm, colspace=5mm, subcolspace=8mm]{tikzposter}
 \block{\textbf{\textsc{Regional Goal Scores Over Time}} 
 \item[]{Every year, previous scores are re-calculated with the most recent methods.}}
 {%
-\begin{tikzfigure}[Scores over time using the 2018 methods.]
-\includegraphics[width=0.4\linewidth]{example-image}
-\end{tikzfigure}
+\begin{Figure}[Scores over time using the 2018 methods.]
+<<rgn_testplot, dev="png">>=
+time_series_rgn_plot
+@
+\end{Figure}
 }
 
 \end{columns}
+
+%----------------------------------------------------------------------------------------
+% END DOCUMENT
+%----------------------------------------------------------------------------------------
 
 \end{document}
