@@ -1,32 +1,51 @@
-## load required packages, install if needed
-library(knitr)
-library(ggplot2)
-library(stringr)
-library(tidyverse)
-library(ggrepel) # install.packages("ggrepel")
-library(cowplot) # install.packages("cowplot")
-library(magick) # install.packages("magick")
-library(RColorBrewer)
+---
+title: "Plot - region ranking and scores over time"
+author: "Camila Vargas"
+date: "9/10/2018"
+output: html_document
+---
 
-## setwd and define paths for outputs etc
-setwd("./region_cards")
-if(!file.exists("output")){dir.create(path = "output/")}
-knitr::opts_knit$set(base.dir = "output/", echo = FALSE, warning = FALSE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-## generate general header information
-makedate <- format(Sys.time(), "%b %d %Y")
+This document contains the necesary code to plot scores of the OHI annual global sassesment over time for every region. And a ranking plot indicating the rank of every region in the specified assesment year. 
+The plots are created using `ggplot2` and then converted to `plotly`. The ggplot version of these plots were created for the region summary cards and the plotly version for disply at http://ohi-science.org/ohi-global/scores
 
-## read in time series dataset with information for all regions' ids and names
+## Setup
+
+```{r}
+##Packages needed. If not install use: install.pakcage("")
+library(tidyverse) #install.packages("tidyverse")
+library(plotly) #install.packages("plotly")
+library(readr) #install.packages()
+library(cowplot) #install.packages("cowplot")
+library(ggrepel) #install.packages("ggrepel")
+library(RColorBrewer) #install.packages("RColorBrewer")
+```
+
+
+## Data
+
+```{r}
+
+## Location time series dataset with information for all regions' ids and names
 score_data_loc <- "https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv"
+
 rgn_data_loc <- "https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv"
 
 
+## Read in the data
 scores <- read.csv(score_data_loc) %>%
   rename(abb = "goal", rgn_id = "region_id")
+
 region_names <- read.csv(rgn_data_loc, colClasses = c(rgn_name = "character")) %>% 
   select(rgn_id, rgn_name) 
-  
+```
 
+## Wrangle data for time series plots
+
+```{r}
 ## goals dataframe
 goals <- c("Index", 
            "Artisanal Opporunities", 
@@ -56,13 +75,23 @@ goals_descrip <- c("Overall Ocean Health Index score",
 
 goals <-  data.frame(goal = goals, abb = goals_abbrev, description = goals_descrip)
 
+
+##additional step to lable each line with the goal abbreviation
 scores_description <- scores %>% 
   left_join(goals, by = "abb") %>% 
   mutate(label = ifelse(year == max(year), as.character(abb), NA_character_))
 
 
-## create the cards!
-for(rgn in c(16, 224, 70)){ # for(rgn in region_names$rgn_id){
+```
+
+
+## Loop to create one plot for each region
+
+
+```{r}
+
+ for(rgn in region_names$rgn_id){ #rgn= region_names$rgn_id[224] - testing for one region
+#for(rgn in c(70, 40, 224)) #testing for three regions
   
   ## subset score data for country/region
   rgn_score_data <- scores_description %>% 
@@ -70,63 +99,50 @@ for(rgn in c(16, 224, 70)){ # for(rgn in region_names$rgn_id){
     dplyr::filter(dimension == "score") %>% 
     dplyr::filter(abb %in% c("AO", "BD", "CP", "CS", "CW", "FP", "Index", "LE", "NP", "SP", "TR"))
   
-  ## by-region header and scorecard filename information
-  regioncard_title <- region_names$rgn_name[region_names$rgn_id == rgn]
-  filename <- str_to_lower(str_replace_all(regioncard_title, " ", "_"))
-  
   
   ## create time series plot
-  time_series_rgn_plot <- ggplot(rgn_score_data %>% filter(abb != "Index"),
+time_series_rgn_plot <- ggplot(rgn_score_data %>% filter(abb != "Index"),
                                  aes(x = year, y = score, color = goal)) +
     geom_line(data = rgn_score_data %>% filter( abb == "Index"),
               aes(x = year, y = score), size = 1.8, color = "gray20", alpha = 1) +
     geom_point(data = rgn_score_data %>% filter(abb == "Index"),
                aes(x = year, y = score, text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 2, color = "gray20") +
     geom_text_repel(data = rgn_score_data%>% filter( abb == "Index"),
-                    aes(label = label), 
-                    na.rm = TRUE,
-                    fontface = "bold",
-                    # hjust = 0,
-                    nudge_x = 0.01,
-                    nudge_y = 0.1,
-                    # direction = "y",
-                    point.padding = unit(8, "points"),
-                    size = 3, 
-                    segment.color = NA, 
-                    color = "gray20") +
+        aes(label = label),
+        na.rm = TRUE,
+       fontface = "bold",
+        hjust = 0,
+        nudge_x = 0.1,
+        nudge_y = 0,
+        direction = "y",
+        point.padding = unit(8, "points"),
+        size = 3,
+       segment.color = NA,
+      color = "gray20")+
     geom_line(aes(group = goal), alpha = 1, size = 1) +
     geom_point(aes(text = paste("Goal: ", goal, "<br>Year:", year, "<br>Score:", score, "<br>Description: ", description)), size = 1.2) +
     scale_x_continuous(breaks = seq(2012, 2018, 1)) +
     labs(y = "Score", color = "Goal")+ 
     theme_cowplot() +
-    theme(# axis.text.x = element_text(angle = 30),
-      axis.title.x = element_blank(),
-      legend.position = "None") +
-    geom_text_repel(aes(label = label),
-                    na.rm = TRUE,
-                    fontface = "bold",
-                    nudge_x = 0.1,
-                    nudge_y = 0,
-                    point.padding = unit(8, "points"), 
-                    size = 3, 
-                    segment.color = NA) +
+    theme(axis.title.x = element_blank(),
+      legend.position = "bottom")+
     scale_color_brewer(palette = "Spectral") +
-    guides(colour = guide_legend(override.aes = list(size = 3))) +
-    coord_fixed(1/30) # to adjust aspect ratio for fitting in card 'block'
+    guides(colour = guide_legend(override.aes = list(size = 3)))
   
+  plot(time_series_rgn_plot)
+
+  ##Save plots as pngs
+  #
   
-  ## select region inset map png from list of files in region maps folder
-  inset_maps <- list.files("../region_maps/figures/inset_maps", full.names = TRUE)
-  region_inset_map <- inset_maps[gsub(".png", "", basename(inset_maps)) == filename]
-  
-  
-  ## flowerplots
-  # flowerplot_github <- "https://github.com/OHI-Science/ohi-global/tree/draft/global2017/Results/figures/FlowerPlots/"
-  # rgn_flowerplot_path <- paste0(flowerplot_github, "flower_", str_replace_all(regioncard_title, " ", ""), ".png")
-  # rgn_flowerplot <- image_read(rgn_flowerplot_path)
-  
-  
-  ## knit the card together
-  knit2pdf(input  = "region_card_v2.Rnw", output = paste0("output/", filename, ".tex"), compiler = "xelatex")
+##Plotly for website. NOTE: ggrapel does not show up in the plotly
+
+#ggplotly(chile_plot, tooltip="text") %>% 
+ # config(displayModeBar = F)
   
 }
+
+```
+
+## Wrangle data for rank plots
+
+

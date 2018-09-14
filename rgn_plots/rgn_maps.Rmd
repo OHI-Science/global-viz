@@ -9,8 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-This document creates one global map for each region highlighting their EEZ and on "zoon-in" map per region indication their eez. This was done as part of the OHI global fellowship as an independent project.
-For more information on the process of how to create these maps see globalfellows-issues issue #40.
+This document creates one global map for each region highlighting their EEZ and on "zoon-in" map per region indication their eez. This was done as part of the OHI global fellowship indepenetn project. 
 
 ## Setup
 
@@ -34,10 +33,12 @@ source('https://raw.githubusercontent.com/OHI-Science/ohiprep_v2018/master/src/R
 
 
 ### Region "zoom-in" map
-For this maps we are going to use the low resolution shapefile find in [this folder](https://github.com/OHI-Science/ohiprep/tree/master/globalprep/spatial/downres) to extract the eex per country and adding a base map using ggmaps.
+
+The first step was to create a map highlinting each region eez. These maps where created using the med resolution shapefile find in [this folder](https://github.com/OHI-Science/ohiprep/tree/master/globalprep/spatial/downres). The shapefiles with the eez for each region ehate then combined with a base map using ggmap.
+
 
 ```{r}
-## Read the shape fill for all regions and filter for eez (our area of interest for these maps)
+## Read the shapefile for all regions and filter for eez (our area of interest for these maps)
 
 all_rgns <- sf::st_read('../../ohiprep/globalprep/spatial/downres', layer="rgn_all_gcs_med_res") %>%
   dplyr::filter(rgn_typ == "eez") %>% 
@@ -64,7 +65,7 @@ plot(all_rgns[1])
 
 ### Test with on region
 
-Before running the loop (and building the loop in this case Itested the method in one region, Chile)
+TEsting the methods in one region (Chile), before running the loop (and building the loop in this case).
 
 ```{r}
 ##Steps to creat each region map
@@ -73,6 +74,7 @@ Before running the loop (and building the loop in this case Itested the method i
 rgn_eez <- all_rgns %>%
   dplyr::filter(rgn_id== 224) ## For loop rgn_id == i?
 
+plot(rgn_eez)
 
 ## 2. Extract bounding box
 
@@ -81,7 +83,7 @@ rgn_bbox <- as.matrix(st_bbox(rgn_eez))
 
 ## 3. Create the base map with the corresponding bbox
 rgn_loc <- rgn_bbox[1:4]
-rgn_bmap <- get_map(location = rgn_bbox, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
+rgn_bmap <- get_map(location = rgn_loc, zoom = 3, source = "google", maptype = "terrain", crop = FALSE)
 
 plot(rgn_bmap)
 
@@ -92,15 +94,17 @@ png(filename ="figures/chile_eez.png", res=500, width=7, height=7, units="in", b
 plot_eez <- plot(st_geometry(rgn_tans), col = rgb(red = 1, green = 0, blue = 0, alpha = 0.2),border=NA, bgMap = rgn_bmap) #st_geometry removes the column name (rgn_id)
 dev.off()
 
+plot(plot_eez)
+
 ```
 
 
 ## Ceating inset maps for each region
-The inset map is a map of the world highlighting each region eez.
+The inset map is a worldmap where the eez of a specific region is highlighted. 
 
 ```{r}
 
-## Wrangle region object imported from spatiol_common.R
+## Wrangle region object imported from spatial_common.R
 regions <- as(regions, "Spatial")
 land <- regions[regions$rgn_type %in% c("land", "land-disputed", "land-noeez"), ]
 
@@ -122,7 +126,7 @@ plot_rgn("Chile")
 region_list <- read_csv("https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/spatial/regions_list.csv") 
 
 ##Loop through and save one map per region as a png
-for (region in region_list$rgn_name[1:5]) {
+for (region in region_list$rgn_name) {#test with five regions[1:5]
  
   print(region)
   
@@ -133,25 +137,31 @@ for (region in region_list$rgn_name[1:5]) {
 
 ## Combine both inset and zoom in region
 
-Up to September 2018, this where the initial thought on how to combine the two maps.
-Non of the code below achives the desired outcome. 
+Ideally, the inset map and the eez map would be combined in one figure in order to give a context of wherte the region is. Because of time constrains this is all the progress made here up to the complesion of this fellowship. 
+
+Here some initial thought on how to go about this.
 
 ```{r}
-
+## This package allows you to add images to a plot. 
 library(magick)
 
+##Create a plot with the eez map png
 eez <- ggdraw()+
   draw_image("figures/chile_eez.png")
-  
+
+##Creat a plot with the inset png  
 inset <- ggdraw()+
-  draw_image("figures/chile_eez.png", x = 0, y = 0, width = 1, height = 1, scale = 1)+
+  #draw_image("figures/chile_eez.png", x = 0, y = 0, width = 1, height = 1, scale = 1)+
   draw_image("figures/inset_maps/chile.png",scale = 0.6, clip="on")
 
-##Thought:
+##Thought 1:
 ##Both images have the same hight and width. See where they where saves. So next step can by trying to remove the "transparent" space of the inset map and then try the draw image scale..
 
-
+##This function plots one image next to the other
 plot_grid(inset, eez)
+
+
+## Thought 2: In order to make it easer to move the inset map around maybe it counf be possible to create a xy plot in ggplot and print the eez mp on top and the inset map at the corner.
 
 ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
     geom_point(size = 3) +
@@ -159,7 +169,7 @@ ggplot(data.frame(x = 1:3, y = 1:3), aes(x, y)) +
     draw_image(img2, x = 2, y = 2, scale = .9)
 
 
-## Example from the internet importing a random figure. 
+## Example code to plot two images in one plot
 img <- magick::image_read("http://jeroen.github.io/images/tiger.svg")
   img <- magick::image_transparent(img, color = "white")
   img2 <- magick::image_negate(img)
@@ -169,7 +179,9 @@ img <- magick::image_read("http://jeroen.github.io/images/tiger.svg")
     draw_image(img , x = 1, y = 1, scale = .9) +
     draw_image(img2, x = 2, y = 2, scale = .9)
 
-
+  ggdraw()+draw_image(img)
+  
+##Thought 3: Seach on other packages, or option for ploting two images together.
 
 ```
 

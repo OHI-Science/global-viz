@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+This document prepares the data and creates one plot per region showing the OHI scores pero goal over time. This plots where created as part of an nindependent project for the OHI Global fellowship.
+
 ## Setup
 
 ```{r}
@@ -25,7 +27,7 @@ library(beyonce)
 
 ## Data wrangling
 
-Prapare the data frame for plotting
+Prapare the dataframe for plotting
 
 ```{r}
 
@@ -144,5 +146,15 @@ ggplotly(chile_plot, tooltip="text") %>%
 ```
 
 
+```{r}
+##for loop to create plots for all regions
+
+for rgn in scores_description$rgn_id{
+  
+  
+}
+
+
+```
 
 

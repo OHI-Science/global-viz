@@ -1,0 +1,117 @@
+---
+title: "Region Ranking plots"
+author: "Camila Vargas"
+date: "8/24/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Setup
+
+```{r}
+library(tidyverse)
+library(plotly)
+library(readr)
+library(cowplot)
+library(ggrepel)
+library(plotly)
+
+
+```
+
+## Read data
+```{r}
+##Read in the socres
+scores <- read.csv('https://raw.githubusercontent.com/OHI-Science/ohi-global/draft/eez/scores.csv') %>%
+  rename(abb = "goal", rgn_id = "region_id")
+
+## Read table with region names (need regions names to disply in the plotly hover)
+
+rgn_details <- read.csv("https://raw.githubusercontent.com/OHI-Science/ohiprep_v2018/master/src/LookupTables/rgn_details.csv") %>%
+  mutate(rgn_nam = as.character(rgn_nam)) %>% 
+  mutate(rgn_name = ifelse(stringr::str_detect(rgn_nam,"Cura\\Sao"), "Curaçao", rgn_nam)) %>% 
+  select(rgn_id, rgn_name)
+
+
+
+
+```
+
+
+## Data wrangling
+
+Prapare the data frame for plotting. In this case the ranking is ploted based on the scores of the most resent assessment 
+
+```{r}
+##Data
+
+rank <- scores %>% 
+  dplyr::filter(dimension == "score",
+                abb == "Index",
+                year == 2018) %>%
+  dplyr::left_join(rgn_details, by= "rgn_id") %>% 
+  dplyr::arrange(desc(score)) %>% 
+  dplyr::mutate(ranking = seq(1, 222, 1))
+
+
+```
+
+
+
+## The plot
+
+
+```{r}
+##Keep in mind this palette - flower plot
+#display.brewer.pal(11,"RdYlBu")
+#brewer.pal(11,"RdYlBu")
+rgn=224
+
+#for(rgn in c(16, 224, 70)){ # for(rgn in region_names$rgn_id){
+  
+  ## subset score data for country/region
+  ##gn_score_data <- scores_description %>% 
+    #dplyr::filter(rgn_id == rgn) %>% 
+
+
+rank_plot <- ggplot()+
+  geom_bar(data = rank %>% 
+             filter(rgn_id != 224),
+           aes(x= ranking, y= score, text= paste("Region: ", rgn_name, "<br>Ranking: ", ranking, "<br>Score: ", score)), stat = "identity", width = .2, color= '#3288BD', alpha= 0.9)+
+  geom_bar(data = rank %>% 
+             filter(rgn_id==224),
+           aes(x= ranking, y= score, text= paste("Region: ", rgn_name, "<br>Ranking: ", ranking, "<br>Score: ", score)), stat = "identity", width = .2, color= '#9E0142', alpha= 0.9)+
+  expand_limits(y = 100)+
+    scale_y_continuous(name = "Score", expand = c(0,0), breaks = c(0, 25, 50, 75, 100))+
+    theme_cowplot()+
+    theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(vjust = 2.6),
+        axis.line.x = element_blank(),
+        axis.ticks.x = element_blank()) #color = "grey45"
+  
+  
+## for card
+  plot(rank_plot)
+
+  ## For website only
+  ggplotly(rank_plot, tooltip="text")
+  
+```
+
+
+
+
+
+
+
+
+
+
+
